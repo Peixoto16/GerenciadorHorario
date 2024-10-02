@@ -25,3 +25,5 @@ CREATE TABLE IF NOT EXISTS agendamento (
    FOREIGN KEY (funcid) REFERENCES funcionario(funcid) ON DELETE CASCADE,
    UNIQUE (data, hora)
 );
+
+

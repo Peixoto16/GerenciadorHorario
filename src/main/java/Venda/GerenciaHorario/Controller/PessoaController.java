@@ -1,15 +1,12 @@
 package Venda.GerenciaHorario.Controller;
 
 import Venda.GerenciaHorario.Model.Pessoa;
-import Venda.GerenciaHorario.Repository.PessoaRepository;
 import Venda.GerenciaHorario.Service.PessoaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import javax.swing.text.html.Option;
 import java.util.Optional;
 
 @RestController
@@ -36,13 +33,26 @@ public class PessoaController {
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
+    /*
+    Recebe os dados para criar o cliente, envia para o service e ao receber
+    retorna um http com o status referente ao que foi retornado.
+    */
     @PostMapping("/criarpessoas")
     public ResponseEntity<Pessoa> create(@RequestBody Pessoa pessoa) {
         Optional<Pessoa> createdPessoa = pessoaService.create(pessoa);
 
-        return createdPessoa
-                .map(p -> ResponseEntity.status(HttpStatus.CREATED).body(p))
+        return createdPessoa.map(p -> ResponseEntity.status(HttpStatus.CREATED).body(p))
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
+    }
+
+
+    @PutMapping("/editarpessoa/{cpf}")
+    public ResponseEntity<Pessoa> update(@PathVariable(name = "cpf") String cpf,
+                                         @RequestBody Pessoa pessoa) {
+        Optional<Pessoa> updatedPessoa = pessoaService.update(cpf, pessoa);
+
+        return updatedPessoa.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
 
