@@ -4,6 +4,7 @@ import Venda.GerenciaHorario.Model.Pessoa;
 import Venda.GerenciaHorario.Repository.PessoaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import Venda.GerenciaHorario.DTO.PessoaDTO;
 
 @Service
 public class PessoaService implements PessoaServiceImp {
@@ -12,40 +13,51 @@ public class PessoaService implements PessoaServiceImp {
     private PessoaRepository repository;
 
     @Override
-    public Pessoa findById(Long id) {
-        return repository.findById(id)
+    public PessoaDTO findById(Long id) {
+        Pessoa pessoa = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Pessoa não encontrada"));
+        return convertToDTO(pessoa);
     }
 
-    public Pessoa findByCpf(String cpf) {
-        return repository.findByCpf(cpf)
+    public PessoaDTO findByCpf(String cpf) {
+        Pessoa pessoa = repository.findByCpf(cpf)
                 .orElseThrow(() -> new RuntimeException("Pessoa não encontrada"));
+        return convertToDTO(pessoa);
     }
 
     @Override
-    public Pessoa create(Pessoa pessoa) {
-        if (repository.findByCpf(pessoa.getCpf()).isPresent()) {
+    public PessoaDTO create(PessoaDTO pessoaDTO) {
+        if (repository.findByCpf(pessoaDTO.cpf()).isPresent()) {
             throw new RuntimeException("Pessoa já existe");
         }
-        return repository.save(pessoa);
+        Pessoa pessoa = new Pessoa();
+        pessoa.setNome(pessoaDTO.nome());
+        pessoa.setCpf(pessoaDTO.cpf());
+        pessoa.setCel(pessoaDTO.cel());
+        pessoa.setDescricao(pessoaDTO.descricao());
+        return convertToDTO(repository.save(pessoa));
     }
 
     @Override
-    public Pessoa update(String cpf, Pessoa pessoa) {
+    public PessoaDTO update(String cpf, PessoaDTO pessoaDTO) {
         Pessoa existingPessoa = repository.findByCpf(cpf)
                 .orElseThrow(() -> new RuntimeException("Pessoa não encontrada"));
 
-        existingPessoa.setNome(pessoa.getNome());
-        existingPessoa.setCel(pessoa.getCel());
-        existingPessoa.setDescricao(pessoa.getDescricao());
+        existingPessoa.setNome(pessoaDTO.nome());
+        existingPessoa.setCel(pessoaDTO.cel());
+        existingPessoa.setDescricao(pessoaDTO.descricao());
 
-        return repository.save(existingPessoa);
+        return convertToDTO(repository.save(existingPessoa));
     }
 
-    public Pessoa delete(String cpf) {
+    public PessoaDTO delete(String cpf) {
         Pessoa deletePessoa = repository.findByCpf(cpf)
                 .orElseThrow(() -> new RuntimeException("Pessoa não encontrada"));
         repository.delete(deletePessoa);
-        return deletePessoa;
+        return convertToDTO(deletePessoa);
+    }
+
+    private PessoaDTO convertToDTO(Pessoa pessoa) {
+        return new PessoaDTO(pessoa.getID(), pessoa.getNome(), pessoa.getCpf(), pessoa.getCel(), pessoa.getDescricao());
     }
 }

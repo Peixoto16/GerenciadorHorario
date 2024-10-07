@@ -1,15 +1,16 @@
 package Venda.GerenciaHorario.Service;
 
+import Venda.GerenciaHorario.DTO.PessoaDTO;
 import Venda.GerenciaHorario.Model.Pessoa;
 
 import java.util.Optional;
 
 public interface PessoaServiceImp {
 
-    Pessoa findById(Long id);
-    Pessoa create(Pessoa pessoa);
-    Pessoa update(String cpf, Pessoa pessoa);
-    Pessoa delete(String cpf);
+    PessoaDTO findById(Long id);
+    PessoaDTO create(PessoaDTO pessoaDTO);
+    PessoaDTO update(String cpf, PessoaDTO pessoaDTO);
+    PessoaDTO delete(String cpf);
 
 }
 
