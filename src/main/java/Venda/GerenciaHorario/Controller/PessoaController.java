@@ -18,7 +18,7 @@ public class PessoaController {
 
     @GetMapping(value = "/{id}")
     public ResponseEntity<Pessoa> findById(@PathVariable(name = "id") Long id) {
-        Optional<Pessoa> pessoa = pessoaService.findById(id);
+        Optional<Pessoa> pessoa = Optional.ofNullable(pessoaService.findById(id));
 
         // Se a pessoa existir, retorna 200 OK com o objeto; senão, retorna 404 Not Found
         return pessoa.map(ResponseEntity::ok)
@@ -27,7 +27,7 @@ public class PessoaController {
 
     @GetMapping(value = "/cpf/{cpf}")
     public ResponseEntity<Pessoa> findByCpf(@PathVariable(name = "cpf") String cpf) {
-        Optional<Pessoa> pessoa = pessoaService.findByCpf(cpf);
+        Optional<Pessoa> pessoa = Optional.ofNullable(pessoaService.findByCpf(cpf));
 
         return pessoa.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
@@ -37,23 +37,31 @@ public class PessoaController {
     Recebe os dados para criar o cliente, envia para o service e ao receber
     retorna um http com o status referente ao que foi retornado.
     */
-    @PostMapping("/criarpessoas")
+    @PostMapping("/criar")
     public ResponseEntity<Pessoa> create(@RequestBody Pessoa pessoa) {
-        Optional<Pessoa> createdPessoa = pessoaService.create(pessoa);
+        Optional<Pessoa> createdPessoa = Optional.ofNullable(pessoaService.create(pessoa));
 
         return createdPessoa.map(p -> ResponseEntity.status(HttpStatus.CREATED).body(p))
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
     }
 
 
-    @PutMapping("/editarpessoa/{cpf}")
+    @PutMapping("/editar/{cpf}")
     public ResponseEntity<Pessoa> update(@PathVariable(name = "cpf") String cpf,
                                          @RequestBody Pessoa pessoa) {
-        Optional<Pessoa> updatedPessoa = pessoaService.update(cpf, pessoa);
+        Optional<Pessoa> updatedPessoa = Optional.ofNullable(pessoaService.update(cpf, pessoa));
 
         return updatedPessoa.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
+    @DeleteMapping("/deletar/{cpf}")
+    public ResponseEntity<Object> deleted(@PathVariable(name = "cpf") String cpf) {
+        Optional<Pessoa> deletePessoa = Optional.ofNullable(pessoaService.delete(cpf));
+
+        return deletePessoa.map(p -> ResponseEntity.status(HttpStatus.NO_CONTENT).build()) // 204 No Content
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("Pessoa não encontrada")); // 404 Not Found
+    }
 
 }
