@@ -1,10 +1,12 @@
 package Venda.GerenciaHorario.Service;
 
+import Venda.GerenciaHorario.DTO.PessoaDTO;
 import Venda.GerenciaHorario.Model.Pessoa;
 import Venda.GerenciaHorario.Repository.PessoaRepository;
+import Venda.GerenciaHorario.Service.Exception.JaExistenteException;
+import Venda.GerenciaHorario.Service.Exception.NaoEncontradaException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import Venda.GerenciaHorario.DTO.PessoaDTO;
 
 @Service
 public class PessoaService implements PessoaServiceImp {
@@ -12,23 +14,16 @@ public class PessoaService implements PessoaServiceImp {
     @Autowired
     private PessoaRepository repository;
 
-    @Override
-    public PessoaDTO findById(Long id) {
-        Pessoa pessoa = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Pessoa não encontrada"));
-        return convertToDTO(pessoa);
-    }
-
     public PessoaDTO findByCpf(String cpf) {
         Pessoa pessoa = repository.findByCpf(cpf)
-                .orElseThrow(() -> new RuntimeException("Pessoa não encontrada"));
+                .orElseThrow(() -> new NaoEncontradaException("Pessoa não encontrada"));
         return convertToDTO(pessoa);
     }
 
     @Override
     public PessoaDTO create(PessoaDTO pessoaDTO) {
         if (repository.findByCpf(pessoaDTO.cpf()).isPresent()) {
-            throw new RuntimeException("Pessoa já existe");
+            throw new JaExistenteException("Pessoa já existe");
         }
         Pessoa pessoa = new Pessoa();
         pessoa.setNome(pessoaDTO.nome());
@@ -41,7 +36,7 @@ public class PessoaService implements PessoaServiceImp {
     @Override
     public PessoaDTO update(String cpf, PessoaDTO pessoaDTO) {
         Pessoa existingPessoa = repository.findByCpf(cpf)
-                .orElseThrow(() -> new RuntimeException("Pessoa não encontrada"));
+                .orElseThrow(() -> new NaoEncontradaException("Pessoa não encontrada"));
 
         existingPessoa.setNome(pessoaDTO.nome());
         existingPessoa.setCel(pessoaDTO.cel());
@@ -52,7 +47,7 @@ public class PessoaService implements PessoaServiceImp {
 
     public PessoaDTO delete(String cpf) {
         Pessoa deletePessoa = repository.findByCpf(cpf)
-                .orElseThrow(() -> new RuntimeException("Pessoa não encontrada"));
+                .orElseThrow(() -> new NaoEncontradaException("Pessoa não encontrada"));
         repository.delete(deletePessoa);
         return convertToDTO(deletePessoa);
     }

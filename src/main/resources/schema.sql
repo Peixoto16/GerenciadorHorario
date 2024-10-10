@@ -15,15 +15,14 @@ CREATE TABLE IF NOT EXISTS funcionario (
 );
 
 CREATE TABLE IF NOT EXISTS agendamento (
-   agendamentoid SERIAL PRIMARY KEY,
-   pessoaid INT NOT NULL,
-   funcid INT NOT NULL,
-   data DATE NOT NULL,
-   hora TIME NOT NULL,
-   descricao TEXT,
-   FOREIGN KEY (pessoaid) REFERENCES pessoa(pessoaid) ON DELETE CASCADE,
-   FOREIGN KEY (funcid) REFERENCES funcionario(funcid) ON DELETE CASCADE,
-   UNIQUE (data, hora)
+    agendamentoid SERIAL PRIMARY KEY,
+    pessoaid INT NOT NULL,
+    funcid INT NOT NULL,
+    data_hora TIMESTAMP NOT NULL,
+    descricao TEXT,
+    FOREIGN KEY (pessoaid) REFERENCES pessoa(pessoaid) ON DELETE CASCADE,
+    FOREIGN KEY (funcid) REFERENCES funcionario(funcid) ON DELETE CASCADE,
+    UNIQUE (data_hora, pessoaid)
 );
 
 
